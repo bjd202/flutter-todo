@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:intl/intl.dart';
+
 
 
 
@@ -22,7 +24,8 @@ class _HomeState extends State<Home>{
 
   List<dynamic> todoList = [];
   int page = 0;
-  int size = 20;
+  int size = 10;
+  bool last = false;
   final _scrollController = ScrollController();
   bool _isLoading = false;
 
@@ -64,10 +67,18 @@ class _HomeState extends State<Home>{
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         List<dynamic> content = data["content"];
+        last = data["last"];
+        int totalPages = data["totalPages"];
+
+        if (last) {
+          page = totalPages - 1;
+        }
+
         setState(() {
           // todoList = data.map((item) => item["title"]).toList();
           todoList.addAll(content);
         });
+
       } else {
         throw Exception("todo list 불러오기 실패");
       }
@@ -75,7 +86,9 @@ class _HomeState extends State<Home>{
       logger.e(e);
     }
     
-    _isLoading = false;
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> fetchTodoList() async{
@@ -97,6 +110,31 @@ class _HomeState extends State<Home>{
     
   }
 
+  String dateFormatter(data){
+    String formattedDate = "${data[0]}년 ${data[1].toString().padLeft(2, '0')}월 ${data[2].toString().padLeft(2, '0')}일";
+    return formattedDate;
+  }
+
+  Color subtitleTextColor(startDt, endDt){
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyyMMdd').format(now);
+
+    String sDt = "${startDt[0]}${startDt[1].toString().padLeft(2, '0')}${startDt[2].toString().padLeft(2, '0')}";
+    String eDt = "${endDt[0]}${endDt[1].toString().padLeft(2, '0')}${endDt[2].toString().padLeft(2, '0')}";
+    
+    int result1 = formattedDate.compareTo(sDt);
+    int result2 = formattedDate.compareTo(eDt);
+
+    int test = "20240320".compareTo("20240319");
+    test = "20240320".compareTo("20240321");
+
+    if (result1 >= 0 && result2 <= 0) {
+      return Colors.green.shade200;
+    }else{
+      return Colors.red.shade200;
+    }
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -112,6 +150,12 @@ class _HomeState extends State<Home>{
           } else {
             return ListTile(
               title: Text(todoList[index]["title"]),
+              subtitle: Text(
+                "${dateFormatter(todoList[index]["startDt"])} ~ ${dateFormatter(todoList[index]["endDt"])}",
+                style: TextStyle(
+                  color: subtitleTextColor(todoList[index]["startDt"], todoList[index]["endDt"])
+                ),
+              ),
             );
           }
         },
