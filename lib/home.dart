@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:intl/intl.dart';
+import 'package:todo/create.dart';
+import 'package:todo/detail.dart';
 
 
 
@@ -63,9 +65,11 @@ class _HomeState extends State<Home>{
     try {
       page += 1;
       size = 10;
-      final response = await http.get(Uri.parse("http://localhost:8080/api/todo/list?page=${page}&size=${size}"));
+      final response = await http.get(
+        Uri.parse("http://localhost:8080/api/todo/list?page=${page}&size=${size}"),
+      );
       if (response.statusCode == 200) {
-        Map<String, dynamic> data = jsonDecode(response.body);
+        Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
         List<dynamic> content = data["content"];
         last = data["last"];
         int totalPages = data["totalPages"];
@@ -93,9 +97,11 @@ class _HomeState extends State<Home>{
 
   Future<void> fetchTodoList() async{
     try {
+      page = 0;
+      size = 10;
       final response = await http.get(Uri.parse("http://localhost:8080/api/todo/list?page=${page}&size=${size}"));
       if (response.statusCode == 200) {
-        Map<String, dynamic> data = jsonDecode(response.body);
+        Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
         List<dynamic> content = data["content"];
         setState(() {
           // todoList = data.map((item) => item["content"]).toList();
@@ -125,9 +131,6 @@ class _HomeState extends State<Home>{
     int result1 = formattedDate.compareTo(sDt);
     int result2 = formattedDate.compareTo(eDt);
 
-    int test = "20240320".compareTo("20240319");
-    test = "20240320".compareTo("20240321");
-
     if (result1 >= 0 && result2 <= 0) {
       return Colors.green.shade200;
     }else{
@@ -149,6 +152,7 @@ class _HomeState extends State<Home>{
             return _isLoading ? const CircularProgressIndicator() : Container();
           } else {
             return ListTile(
+              // key: todoList[index]["id"],
               title: Text(todoList[index]["title"]),
               subtitle: Text(
                 "${dateFormatter(todoList[index]["startDt"])} ~ ${dateFormatter(todoList[index]["endDt"])}",
@@ -156,11 +160,29 @@ class _HomeState extends State<Home>{
                   color: subtitleTextColor(todoList[index]["startDt"], todoList[index]["endDt"])
                 ),
               ),
+              onTap: () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => Detail(data: todoList[index],))
+                );
+              },
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => Create(),)
+          );
 
-      )
+          if (result != null && result) {
+            fetchTodoList();
+          }
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

@@ -89,40 +89,40 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: Icon(Icons.menu)
-            );
-          },
-        ),
+        // leading: Builder(
+        //   builder: (context) {
+        //     return IconButton(
+        //       onPressed: () {
+        //         Scaffold.of(context).openDrawer();
+        //       },
+        //       icon: Icon(Icons.menu)
+        //     );
+        //   },
+        // ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text("메뉴"),
-              decoration: BoxDecoration(
-                color: Colors.blue
-              ),
-            ),
-            ListTile(
-              title: Text("추가"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => Create())
-                );
-              },
-            )
-          ],
-        ),
-      ),
+      // drawer: Drawer(
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: <Widget>[
+      //       DrawerHeader(
+      //         child: Text("메뉴"),
+      //         decoration: BoxDecoration(
+      //           color: Colors.blue
+      //         ),
+      //       ),
+      //       ListTile(
+      //         title: Text("추가"),
+      //         onTap: () {
+      //           Navigator.pop(context);
+      //           Navigator.push(
+      //             context, 
+      //             MaterialPageRoute(builder: (context) => Create())
+      //           );
+      //         },
+      //       )
+      //     ],
+      //   ),
+      // ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
