@@ -160,11 +160,15 @@ class _HomeState extends State<Home>{
                   color: subtitleTextColor(todoList[index]["startDt"], todoList[index]["endDt"])
                 ),
               ),
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final result = await Navigator.push(
                   context, 
                   MaterialPageRoute(builder: (context) => Detail(data: todoList[index],))
                 );
+
+                if (result != null && result) {
+                  fetchTodoList();
+                }
               },
             );
           }

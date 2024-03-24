@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(
         title: 'TODO',
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
